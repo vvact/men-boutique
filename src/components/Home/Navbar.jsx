@@ -7,6 +7,7 @@ export default function Navbar() {
       <div className="flex gap-4">
         <Link to="/">Home</Link>
         <Link to="/products">Products</Link>
+        <Link to="/login">Login</Link>
       </div>
       {/* Cart Button */}
       <CartButton />

@@ -7,6 +7,8 @@ import Checkout from './pages/Checkout';
 import Navbar from './components/Home/Navbar';
 import Footer from './components/Footer';
 import CategoryPage from "./pages/CategoryPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPages";
 
 export default function App() {
   return (
@@ -14,6 +16,8 @@ export default function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/products" element={<Products />} />
         <Route path="/products/:slug" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />
