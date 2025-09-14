@@ -63,6 +63,19 @@ export const clearCartBackend = createAsyncThunk(
   }
 );
 
+// ----------------- NEW: Merge guest cart into Redux -----------------
+export const mergeCartBackend = createAsyncThunk(
+  "cart/mergeCartBackend",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await api.post("cart/merge/"); // backend endpoint
+      return res.data.cart || res.data; // backend should return merged cart
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
 // ----------------- Initial State -----------------
 const initialState = {
   cart: { items: [], cart_total: 0, item_count: 0 },
@@ -100,7 +113,7 @@ const cartSlice = createSlice({
         existing.line_total = existing.quantity * existing.unit_price;
       } else {
         state.cart.items.push({
-          item_id: Date.now(), // temp ID
+          item_id: Date.now(),
           product: productId,
           variant_id: variantId || null,
           quantity: 1,
@@ -139,6 +152,28 @@ const cartSlice = createSlice({
         state.previousCart = null;
       }
     },
+
+    // ----------------- NEW: Merge a local guest cart -----------------
+    mergeCart: (state, action) => {
+      const incomingItems = action.payload.items;
+      incomingItems.forEach((item) => {
+        const existing = state.cart.items.find(
+          (i) =>
+            i.product === item.product &&
+            (i.variant_id ? i.variant_id === item.variant_id : !i.variant_id)
+        );
+        if (existing) {
+          existing.quantity += item.quantity;
+          existing.line_total = existing.quantity * existing.unit_price;
+        } else {
+          state.cart.items.push({
+            ...item,
+            item_id: item.item_id || Date.now(),
+          });
+        }
+      });
+      recalcTotals(state.cart);
+    },
   },
 
   extraReducers: (builder) => {
@@ -173,6 +208,14 @@ const cartSlice = createSlice({
       .addCase(clearCartBackend.fulfilled, (state, action) => {
         state.cart = action.payload;
         state.previousCart = null;
+      })
+
+      // ---------- NEW: mergeCartBackend ----------
+      .addCase(mergeCartBackend.fulfilled, (state, action) => {
+        state.cart = action.payload;
+      })
+      .addCase(mergeCartBackend.rejected, (state, action) => {
+        state.error = action.payload || "Failed to merge cart";
       })
 
       // ---------- Backend error → rollback ----------
@@ -220,6 +263,7 @@ export const {
   clearCart,
   saveCartSnapshot,
   rollbackCart,
+  mergeCart,          // ✅ added local merge action
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

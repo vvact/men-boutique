@@ -1,68 +1,61 @@
-// src/api.js
+// src/app/api.js
 import axios from "axios";
 
-// Create base Axios instance
+// Create axios instance
 const api = axios.create({
-  baseURL: "https://gentlemanwell.shop/api/",
-  withCredentials: true,
+  baseURL: "http://localhost:8000/api", // update if your backend URL is different
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 });
 
-// Request interceptor: add access token to headers
+// Attach access token automatically
 api.interceptors.request.use(
   (config) => {
-    const accessToken = localStorage.getItem("access_token");
-    if (accessToken && config.headers) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    const token = localStorage.getItem("access");
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: handle 401 + normalize errors
+// Optional: Handle 401 errors (token expired)
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Token refresh flow
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      localStorage.getItem("refresh")
+    ) {
       originalRequest._retry = true;
-      const refreshToken = localStorage.getItem("refresh_token");
+      try {
+        // Refresh the access token
+        const refresh = localStorage.getItem("refresh");
+        const res = await axios.post("http://localhost:8000/api/auth/token/refresh/", {
+          refresh,
+        });
+        localStorage.setItem("access", res.data.access);
 
-      if (refreshToken) {
-        try {
-          const refreshResponse = await axios.post(
-            "http://localhost:8000/api/auth/refresh/",
-            { refresh: refreshToken }
-          );
-
-          localStorage.setItem("access_token", refreshResponse.data.access);
-          localStorage.setItem("refresh_token", refreshResponse.data.refresh);
-
-          originalRequest.headers.Authorization = `Bearer ${refreshResponse.data.access}`;
-          return api(originalRequest);
-        } catch (refreshError) {
-          localStorage.clear();
-          window.location.href = "/login";
-        }
+        // Retry original request
+        originalRequest.headers["Authorization"] = `Bearer ${res.data.access}`;
+        return axios(originalRequest);
+      } catch (err) {
+        console.error("Token refresh failed:", err);
+        localStorage.removeItem("user");
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
+        window.location.href = "/login";
+        return Promise.reject(err);
       }
     }
 
-    // ✅ Normalize error into a string
-    const message =
-      error.response?.data?.detail ||
-      error.response?.data?.message ||
-      (typeof error.response?.data === "string"
-        ? error.response.data
-        : JSON.stringify(error.response?.data)) ||
-      error.message ||
-      "Something went wrong";
-
-    return Promise.reject(message);
+    return Promise.reject(error);
   }
 );
 

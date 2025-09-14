@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, loginWithGoogle } from "../features/auth/loginSlice";
+import { mergeCart, mergeCartBackend, fetchCart } from "../features/cart/cartSlice";
 import { useGoogleLogin } from "@react-oauth/google";
 import { EyeIcon, EyeSlashIcon, UserIcon, KeyIcon } from "@heroicons/react/24/outline";
 
@@ -14,19 +15,55 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  // ---------- Helper: merge guest cart safely ----------
+  const handleCartMerge = async () => {
+    const guestCart = JSON.parse(localStorage.getItem("guestCart"));
+    if (guestCart?.items?.length > 0) {
+      // Merge locally for instant UI update
+      dispatch(mergeCart(guestCart));
+      try {
+        await dispatch(mergeCartBackend()).unwrap();
+      } catch (err) {
+        console.error("Failed to sync guest cart with backend:", err);
+      }
+      localStorage.removeItem("guestCart");
+    }
+    // Refresh cart to ensure consistency
+    await dispatch(fetchCart()).unwrap();
+  };
+
+  // ---------- Email/Password login ----------
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await dispatch(loginUser({ email, password }));
-    if (loginUser.fulfilled.match(result)) {
+    try {
+      const result = await dispatch(loginUser({ email, password })).unwrap();
+
+      // Store user & tokens
+      localStorage.setItem("user", JSON.stringify(result.user));
+      localStorage.setItem("access", result.access);
+      localStorage.setItem("refresh", result.refresh);
+
+      // Merge guest cart
+      await handleCartMerge();
+
       navigate("/");
+    } catch (err) {
+      console.error("Login failed:", err);
     }
   };
 
+  // ---------- Google login ----------
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
         const access_token = tokenResponse.access_token;
-        await dispatch(loginWithGoogle(access_token)).unwrap();
+        const result = await dispatch(loginWithGoogle(access_token)).unwrap();
+
+        localStorage.setItem("user", JSON.stringify(result.user));
+        localStorage.setItem("access", result.access);
+        localStorage.setItem("refresh", result.refresh);
+
+        await handleCartMerge();
         navigate("/");
       } catch (err) {
         console.error("Google login failed:", err);
@@ -45,7 +82,7 @@ const LoginPage = () => {
 
         {error && (
           <div className="mb-6 p-3 bg-red-50 text-red-700 rounded-lg text-center border border-red-200">
-            {error}
+            {error.detail || error}
           </div>
         )}
 
@@ -95,11 +132,7 @@ const LoginPage = () => {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors duration-200"
             >
-              {showPassword ? (
-                <EyeSlashIcon className="h-5 w-5" />
-              ) : (
-                <EyeIcon className="h-5 w-5" />
-              )}
+              {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
             </button>
           </div>
 
@@ -112,34 +145,7 @@ const LoginPage = () => {
                 : "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-md hover:shadow-lg"
             }`}
           >
-            {loading ? (
-              <span className="flex items-center justify-center">
-                <svg
-                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 
-                    3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                Signing in...
-              </span>
-            ) : (
-              "Sign In"
-            )}
+            {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
 

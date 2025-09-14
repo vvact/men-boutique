@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../features/auth/registerSlice";
+import { loginWithGoogle, loginUser } from "../features/auth/loginSlice";
+import { mergeCart, mergeCartBackend, fetchCart } from "../features/cart/cartSlice";
 import { useGoogleLogin } from "@react-oauth/google";
-import { loginWithGoogle } from "../features/auth/loginSlice";
 import { EyeIcon, EyeSlashIcon, UserIcon, KeyIcon } from "@heroicons/react/24/outline";
 
 const RegisterPage = () => {
@@ -15,24 +16,45 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  // ---------- Helper: merge guest cart safely ----------
+  const handleCartMerge = async () => {
+    const guestCart = JSON.parse(localStorage.getItem("guestCart"));
+
+    if (guestCart?.items?.length > 0) {
+      dispatch(mergeCart(guestCart));
+      try {
+        await dispatch(mergeCartBackend()).unwrap();
+      } catch (err) {
+        console.error("Failed to sync guest cart with backend:", err);
+      }
+      localStorage.removeItem("guestCart");
+    }
+    await dispatch(fetchCart());
+  };
+
+  // ---------- Email/Password registration ----------
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const result = await dispatch(registerUser({ email, password }));
-      if (registerUser.fulfilled.match(result)) {
-        alert("Registration successful! You can now log in.");
-        navigate("/login");
+      const result = await dispatch(registerUser({ email, password })).unwrap();
+      if (result?.id) {
+        // Auto-login after registration
+        await dispatch(loginUser({ email, password })).unwrap();
+        await handleCartMerge();
+        navigate("/");
       }
     } catch (err) {
-      console.error(err);
+      console.error("Registration/Login failed:", err);
     }
   };
 
+  // ---------- Google login ----------
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
         const access_token = tokenResponse.access_token;
         await dispatch(loginWithGoogle(access_token)).unwrap();
+        await handleCartMerge();
         navigate("/");
       } catch (err) {
         console.error("Google login failed:", err);
@@ -45,17 +67,13 @@ const RegisterPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md transition-all duration-300 hover:shadow-2xl">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            Create Account
-          </h1>
-          <p className="text-gray-500">
-            Join us today and unlock all features
-          </p>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Create Account</h1>
+          <p className="text-gray-500">Join us today and unlock all features</p>
         </div>
 
         {error && (
           <div className="mb-6 p-3 bg-red-50 text-red-700 rounded-lg text-center border border-red-200">
-            {error}
+            {error.detail || error}
           </div>
         )}
 
@@ -63,11 +81,7 @@ const RegisterPage = () => {
           onClick={() => googleLogin()}
           className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 py-3 px-4 rounded-xl hover:bg-gray-50 transition-all duration-200 mb-6 text-gray-700 font-medium shadow-sm hover:shadow"
         >
-          <img 
-            src="/google-logo.png" 
-            alt="Google" 
-            className="h-5 w-5" 
-          />
+          <img src="/google-logo.png" alt="Google" className="h-5 w-5" />
           Continue with Google
         </button>
 
@@ -109,11 +123,7 @@ const RegisterPage = () => {
               onClick={() => setShowPassword(!showPassword)}
               className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors duration-200"
             >
-              {showPassword ? (
-                <EyeSlashIcon className="h-5 w-5" />
-              ) : (
-                <EyeIcon className="h-5 w-5" />
-              )}
+              {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
             </button>
           </div>
 
@@ -121,22 +131,12 @@ const RegisterPage = () => {
             type="submit"
             disabled={loading}
             className={`w-full py-3 px-4 rounded-xl text-white font-medium transition-all duration-200 ${
-              loading 
-                ? "bg-blue-400 cursor-not-allowed" 
+              loading
+                ? "bg-blue-400 cursor-not-allowed"
                 : "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-md hover:shadow-lg"
             }`}
           >
-            {loading ? (
-              <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Creating account...
-              </span>
-            ) : (
-              "Create Account"
-            )}
+            {loading ? "Creating account..." : "Create Account"}
           </button>
         </form>
 

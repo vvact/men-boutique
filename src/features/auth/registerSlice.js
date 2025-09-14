@@ -6,6 +6,9 @@ const initialState = {
   user: localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user"))
     : null,
+  access: localStorage.getItem("access") || null,
+  refresh: localStorage.getItem("refresh") || null,
+  message: null,
   loading: false,
   error: null,
 };
@@ -15,8 +18,8 @@ export const registerUser = createAsyncThunk(
   "register/registerUser",
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await api.post("/auth/register/", credentials);
-      return response.data; // { id, email }
+      const response = await api.post("/accounts/register/", credentials);
+      return response.data; // { message, user, access, refresh }
     } catch (err) {
       return rejectWithValue(err.response?.data || { detail: "Registration failed" });
     }
@@ -26,7 +29,19 @@ export const registerUser = createAsyncThunk(
 const registerSlice = createSlice({
   name: "register",
   initialState,
-  reducers: {},
+  reducers: {
+    clearRegisterState: (state) => {
+      state.user = null;
+      state.access = null;
+      state.refresh = null;
+      state.message = null;
+      state.loading = false;
+      state.error = null;
+      localStorage.removeItem("user");
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(registerUser.pending, (state) => {
@@ -35,8 +50,15 @@ const registerSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
-        localStorage.setItem("user", JSON.stringify(action.payload));
+        state.user = action.payload.user;
+        state.access = action.payload.access;
+        state.refresh = action.payload.refresh;
+        state.message = action.payload.message;
+
+        // Persist in localStorage
+        localStorage.setItem("user", JSON.stringify(action.payload.user));
+        localStorage.setItem("access", action.payload.access);
+        localStorage.setItem("refresh", action.payload.refresh);
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
@@ -45,4 +67,5 @@ const registerSlice = createSlice({
   },
 });
 
+export const { clearRegisterState } = registerSlice.actions;
 export default registerSlice.reducer;

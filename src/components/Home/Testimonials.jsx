@@ -72,7 +72,7 @@ export default function Testimonials() {
       <svg
         key={i}
         xmlns="http://www.w3.org/2000/svg"
-        className={`h-4 w-4 sm:h-5 sm:w-5 ${i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+        className={`h-4 w-4 sm:h-5 sm:w-5 ${i < rating ? 'text-gold-500 fill-current' : 'text-navy-300'}`}
         viewBox="0 0 20 20"
         fill="currentColor"
       >
@@ -118,21 +118,22 @@ export default function Testimonials() {
   }, []);
 
   return (
-    <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
+    <section className="py-12 px-4 sm:px-6 lg:px-8 bg-navy-900 relative overflow-hidden">
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
-        <div className="text-center mb-8 sm:mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-3">What Our Customers Say</h2>
-          <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto">
+        <div className="text-center mb-10">
+          <h2 className="text-2xl md:text-3xl font-bold text-gold-500 mb-3">What Our Customers Say</h2>
+          <div className="h-1 w-16 bg-gold-600 mx-auto mb-4"></div>
+          <p className="text-base text-navy-100 max-w-3xl mx-auto">
             Don't just take our word for it - hear from our satisfied customers
           </p>
         </div>
 
         {/* Navigation arrows for all screens */}
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-6">
           <button 
             onClick={scrollLeft}
-            className={`p-3 rounded-full bg-white shadow-md text-gray-700 hover:text-blue-600 transition-all duration-300 ${showLeftArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            className={`p-3 rounded-full bg-navy-800 shadow-md text-gold-500 hover:bg-gold-500 hover:text-navy-900 transition-all duration-300 ${showLeftArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             aria-label="Scroll left"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -142,7 +143,7 @@ export default function Testimonials() {
           
           <button 
             onClick={scrollRight}
-            className={`p-3 rounded-full bg-white shadow-md text-gray-700 hover:text-blue-600 transition-all duration-300 ${showRightArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            className={`p-3 rounded-full bg-navy-800 shadow-md text-gold-500 hover:bg-gold-500 hover:text-navy-900 transition-all duration-300 ${showRightArrow ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             aria-label="Scroll right"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -155,13 +156,13 @@ export default function Testimonials() {
         <div className="relative">
           <div 
             ref={scrollContainerRef}
-            className="flex overflow-x-auto snap-x snap-mandatory space-x-6 pb-6 scrollbar-hide"
+            className="flex overflow-x-auto snap-x snap-mandatory gap-6 pb-6 scrollbar-hide"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {testimonials.map((testimonial) => (
               <div 
                 key={testimonial.id}
-                className="flex-shrink-0 w-4/5 sm:w-2/3 md:w-1/2 lg:w-2/5 xl:w-1/3 snap-start bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col transform hover:scale-105"
+                className="flex-shrink-0 w-4/5 sm:w-2/3 md:w-1/2 lg:w-2/5 xl:w-1/3 snap-start bg-navy-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col transform hover:-translate-y-1"
               >
                 {/* Rating */}
                 <div className="p-6 pb-4 flex justify-center">
@@ -172,7 +173,7 @@ export default function Testimonials() {
                 
                 {/* Testimonial content */}
                 <div className="px-6 flex-grow">
-                  <p className="text-gray-700 italic text-center">"{testimonial.content}"</p>
+                  <p className="text-navy-100 italic text-center">"{testimonial.content}"</p>
                 </div>
                 
                 {/* Customer info */}
@@ -180,11 +181,11 @@ export default function Testimonials() {
                   <img
                     src={testimonial.image}
                     alt={testimonial.name}
-                    className="h-12 w-12 rounded-full object-cover mr-4"
+                    className="h-12 w-12 rounded-full object-cover mr-4 border-2 border-gold-500"
                   />
                   <div>
-                    <h3 className="font-semibold text-gray-900">{testimonial.name}</h3>
-                    <p className="text-sm text-gray-600">{testimonial.role}</p>
+                    <h3 className="font-semibold text-white">{testimonial.name}</h3>
+                    <p className="text-sm text-navy-300">{testimonial.role}</p>
                   </div>
                 </div>
               </div>
@@ -192,8 +193,8 @@ export default function Testimonials() {
           </div>
 
           {/* Gradient fade effects */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-gray-50 to-transparent"></div>
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-gray-50 to-transparent"></div>
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-navy-900 to-transparent"></div>
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-navy-900 to-transparent"></div>
         </div>
 
         {/* Indicator dots */}
@@ -202,18 +203,18 @@ export default function Testimonials() {
             <button
               key={index}
               onClick={() => scrollToTestimonial(index)}
-              className={`h-3 w-3 rounded-full transition-all duration-300 ${currentIndex === index ? 'bg-blue-600 scale-125' : 'bg-gray-300 hover:bg-gray-400'}`}
+              className={`h-3 w-3 rounded-full transition-all duration-300 ${currentIndex === index ? 'bg-gold-500 scale-125' : 'bg-navy-600 hover:bg-navy-500'}`}
               aria-label={`Go to testimonial ${index + 1}`}
             />
           ))}
         </div>
 
         {/* Call to action */}
-        <div className="text-center mt-8 sm:mt-12">
-          <p className="text-gray-600 mb-3 sm:mb-4 text-sm sm:text-base">Ready to share your experience?</p>
-          <button className="inline-flex items-center px-5 py-2.5 sm:px-6 sm:py-3 border border-transparent text-sm sm:text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 transform hover:scale-105">
+        <div className="text-center mt-10">
+          <p className="text-navy-300 mb-4">Ready to share your experience?</p>
+          <button className="inline-flex items-center bg-gold-600 hover:bg-gold-500 text-navy-900 font-medium px-6 py-3 rounded-full transition-all duration-300 transform hover:-translate-y-0.5">
             Write a Review
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </button>
@@ -224,6 +225,10 @@ export default function Testimonials() {
       <style jsx>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
       `}</style>
     </section>

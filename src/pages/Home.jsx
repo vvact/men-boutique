@@ -6,7 +6,7 @@ import InstagramSection from "../components/Home/InstagramSection";
 import Promotions from "../components/Home/Promotions";
 import Brands from "../components/Home/Brands";
 import Testimonials from "../components/Home/Testimonials";
-import Newsletter from "../components/Home/Newsletter";
+import FloatingButtons from "../components/Home/FloatingButtons";
 
 export default function Home() {
   return (
@@ -19,7 +19,7 @@ export default function Home() {
       <Promotions />
       <Brands />
       <Testimonials />
-      <Newsletter />
+      <FloatingButtons />
     </div>
   );
 }
