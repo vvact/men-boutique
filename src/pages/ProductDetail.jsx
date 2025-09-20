@@ -1,9 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import Slider from "react-slick";
-import InnerImageZoom from "react-inner-image-zoom";
-import 'react-inner-image-zoom/dist/InnerImageZoom/styles.css';
 
 import api from "../app/api";
 import { addToCartBackend, saveCartSnapshot } from "../features/cart/cartSlice";
@@ -17,12 +14,6 @@ export default function ProductDetailPage() {
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
-
-  const [nav1, setNav1] = useState(null);
-  const [nav2, setNav2] = useState(null);
-
-  const mainSlider = useRef();
-  const thumbSlider = useRef();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -59,68 +50,19 @@ export default function ProductDetailPage() {
     setAdding(false);
   };
 
-  // Main slider settings
-  const mainSettings = {
-    asNavFor: nav2,
-    ref: mainSlider,
-    arrows: true,
-    dots: false,
-    infinite: true,
-    speed: 300,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-  };
-
-  // Thumbnail slider settings
-  const thumbSettings = {
-    asNavFor: nav1,
-    ref: thumbSlider,
-    slidesToShow: Math.min(product.images?.length || 3, 5),
-    slidesToScroll: 1,
-    focusOnSelect: true,
-    swipeToSlide: true,
-    infinite: false,
-    arrows: true,
-    centerMode: false,
-    variableWidth: true,
-  };
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Image Gallery with Thumbnails */}
-        <div className="md:w-1/2 flex flex-col gap-4">
-          {product.images?.length > 0 ? (
-            <>
-              <Slider {...mainSettings} className="mb-2" afterChange={() => setNav2(thumbSlider.current)}>
-                {product.images.map((img, idx) => (
-                  <div key={idx} className="p-2">
-                    <InnerImageZoom
-                      src={img.image}
-                      zoomSrc={img.image}
-                      zoomType="hover"
-                      zoomPreload={true}
-                      alt={img.alt_text || product.name}
-                      className="w-full h-[400px] object-cover rounded-lg"
-                    />
-                  </div>
-                ))}
-              </Slider>
-
-              <Slider {...thumbSettings} className="mt-2" afterChange={() => setNav1(mainSlider.current)}>
-                {product.images.map((img, idx) => (
-                  <div key={idx} className="px-1 cursor-pointer">
-                    <img
-                      src={img.image}
-                      alt={img.alt_text || product.name}
-                      className="w-20 h-20 object-cover rounded border border-gray-300 hover:border-blue-500"
-                    />
-                  </div>
-                ))}
-              </Slider>
-            </>
+    <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+        {/* Product Image */}
+        <div className="md:w-1/2">
+          {product.images?.[0]?.image ? (
+            <img
+              src={product.images[0].image}
+              alt={product.images[0].alt_text || product.name}
+              className="w-full h-64 sm:h-80 md:h-[400px] object-cover rounded-lg"
+            />
           ) : (
-            <div className="w-full h-64 bg-gray-200 flex items-center justify-center rounded-lg">
+            <div className="w-full h-48 sm:h-64 md:h-80 bg-gray-200 flex items-center justify-center rounded-lg">
               No image available
             </div>
           )}
@@ -128,8 +70,8 @@ export default function ProductDetailPage() {
 
         {/* Product Details */}
         <div className="md:w-1/2 flex flex-col gap-4">
-          <h1 className="text-3xl font-bold text-gray-800">{product.name}</h1>
-          <p className="text-xl font-semibold text-gray-700">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">{product.name}</h1>
+          <p className="text-lg sm:text-xl font-semibold text-gray-700">
             KSh {product.final_price}
           </p>
           <p className="text-gray-500">{product.description}</p>
@@ -154,7 +96,6 @@ export default function ProductDetailPage() {
             </button>
           </div>
 
-          {/* Add to Cart */}
           <button
             className="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50"
             disabled={availableStock === 0 || adding}

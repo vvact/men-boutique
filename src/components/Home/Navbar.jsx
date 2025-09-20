@@ -7,7 +7,7 @@ import { logout } from "../../features/auth/loginSlice";
 export default function Navbar() {
   const location = useLocation();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth); // Get logged-in user
+  const { user } = useSelector((state) => state.auth);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const isActiveLink = (path) => location.pathname === path;
@@ -44,14 +44,14 @@ export default function Navbar() {
             >
               Products
             </Link>
-            <Link
-              to="/categories"
-              className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
-                isActiveLink("/categories") ? "text-gold-500 bg-navy-800" : "text-navy-100 hover:text-gold-400 hover:bg-navy-800"
-              }`}
+            <a
+              href="https://www.instagram.com/manwellg15?igsh=MTByd3Z3cXJzOG02YQ%3D%3D&utm_source=qr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-2 rounded-md text-sm font-medium text-navy-100 hover:text-gold-400 hover:bg-navy-800 transition-all duration-300"
             >
-              Categories
-            </Link>
+              Instagram
+            </a>
           </div>
 
           {/* Right side items */}
@@ -119,15 +119,15 @@ export default function Navbar() {
               >
                 Products
               </Link>
-              <Link
-                to="/categories"
-                className={`block px-3 py-2 rounded-md text-base font-medium transition-all duration-300 ${
-                  isActiveLink("/categories") ? "text-gold-500 bg-navy-700" : "text-navy-100 hover:text-gold-400 hover:bg-navy-700"
-                }`}
+              <a
+                href="https://www.instagram.com/manwellg15?igsh=MTByd3Z3cXJzOG02YQ%3D%3D&utm_source=qr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-3 py-2 rounded-md text-base font-medium text-navy-100 hover:text-gold-400 hover:bg-navy-700 transition-all duration-300"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Categories
-              </Link>
+                Instagram
+              </a>
 
               {user ? (
                 <button

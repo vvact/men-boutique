@@ -18,7 +18,7 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span>Nairobi Eastleigh, Kenya</span>
+                <span>Six Street Tower, G15, Eastleigh</span>
               </div>
             </div>
           </div>
@@ -40,8 +40,8 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4 text-gold-400 border-b border-gold-600 pb-2">Connect With Us</h3>
             <div className="mb-6">
               <h4 className="font-medium mb-2 text-navy-100">Customer Service</h4>
-              <p className="text-navy-200">Email: info@manwell.com</p>
-              <p className="text-navy-200">Phone: +254 700 123 456</p>
+              <p className="text-navy-200">Email: manwellofficial@gmail.com</p>
+              <p className="text-navy-200">Phone: +254 707657588</p>
             </div>
             
             <h4 className="font-medium mb-2 text-navy-100">Follow Us</h4>
@@ -58,7 +58,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a 
-                href="https://www.instagram.com" 
+                href="https://www.instagram.com/manwellg15?igsh=MTByd3Z3cXJzOG02YQ%3D%3D&utm_source=qr" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="bg-navy-800 p-2 rounded-full hover:bg-gold-500 transition-colors duration-300"
@@ -69,14 +69,14 @@ export default function Footer() {
                 </svg>
               </a>
               <a 
-                href="https://www.twitter.com" 
+                href="https://www.tiktok.com/@manwell" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="bg-navy-800 p-2 rounded-full hover:bg-gold-500 transition-colors duration-300"
-                aria-label="Twitter"
+                aria-label="TikTok"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                  <path d="M12 2c-.29 0-.575.03-.854.086 3.838.346 6.857 3.525 6.857 7.36V15h-3.43v-5.476c0-1.577-1.28-2.857-2.857-2.857s-2.857 1.28-2.857 2.857 1.28 2.857 2.857 2.857c.178 0 .353-.016.525-.048v3.085c-.171.032-.347.048-.525.048-3.418 0-6.193-2.775-6.193-6.193S8.582 2 12 2z"/>
                 </svg>
               </a>
             </div>
