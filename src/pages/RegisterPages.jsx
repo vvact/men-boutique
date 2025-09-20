@@ -16,39 +16,46 @@ const RegisterPage = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  // ---------- Merge guest cart safely ----------
+  const handleCartMerge = async () => {
+    const guestCart = JSON.parse(localStorage.getItem("guestCart"));
+    if (guestCart?.items?.length > 0) {
+      dispatch(mergeCart(guestCart));
+      try {
+        await dispatch(mergeCart()).unwrap();
+      } catch (err) {
+        console.error("Failed to sync guest cart:", err);
+      }
+      localStorage.removeItem("guestCart");
+    }
+    await dispatch(fetchCart()).unwrap();
+  };
+
+  // ---------- Email registration ----------
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const result = await dispatch(registerUser({ email, password })).unwrap();
-      // Save user & tokens in localStorage
-      localStorage.setItem("user", JSON.stringify(result.user));
-      localStorage.setItem("access", result.access);
-      localStorage.setItem("refresh", result.refresh);
 
-      // Merge guest cart and fetch
-      await dispatch(mergeCart()).unwrap();
-      await dispatch(fetchCart()).unwrap();
-
-      navigate("/");
+      // Redirect to login page instead of home
+      navigate("/login", { replace: true });
     } catch (err) {
       console.error("Registration failed:", err);
     }
   };
 
+  // ---------- Google login ----------
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
         const access_token = tokenResponse.access_token;
-        const result = await dispatch(loginWithGoogle(access_token)).unwrap();
+        await dispatch(loginWithGoogle(access_token)).unwrap();
 
-        localStorage.setItem("user", JSON.stringify(result.user));
-        localStorage.setItem("access", result.access);
-        localStorage.setItem("refresh", result.refresh);
+        // Merge guest cart after login
+        await handleCartMerge();
 
-        await dispatch(mergeCart()).unwrap();
-        await dispatch(fetchCart()).unwrap();
-
-        navigate("/");
+        // Redirect to home page after login
+        navigate("/", { replace: true });
       } catch (err) {
         console.error("Google login failed:", err);
       }
@@ -57,11 +64,11 @@ const RegisterPage = () => {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-navy-50 to-navy-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md transition-all duration-300 hover:shadow-2xl">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-navy-900 mb-2">Create Account</h1>
-          <p className="text-navy-600">Join us today and unlock all features</p>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Create Account</h1>
+          <p className="text-gray-500">Join us today and unlock all features</p>
         </div>
 
         {error && (
@@ -70,51 +77,53 @@ const RegisterPage = () => {
           </div>
         )}
 
+        {/* Google Login */}
         <button
           onClick={() => googleLogin()}
-          className="w-full flex items-center justify-center gap-2 bg-white border border-navy-200 py-3 px-4 rounded-xl hover:bg-navy-50 transition-all duration-200 mb-6 text-navy-800 font-medium shadow-sm hover:shadow"
+          className="w-full flex items-center justify-center gap-2 bg-white border border-gray-300 py-3 px-4 rounded-xl hover:bg-gray-50 transition-all duration-200 mb-6 text-gray-700 font-medium shadow-sm hover:shadow"
         >
           <img src="/google-logo.png" alt="Google" className="h-5 w-5" />
           Continue with Google
         </button>
 
         <div className="flex items-center my-6">
-          <div className="flex-grow border-t border-navy-200"></div>
-          <span className="mx-4 text-navy-500 text-sm">Or register with email</span>
-          <div className="flex-grow border-t border-navy-200"></div>
+          <div className="flex-grow border-t border-gray-300"></div>
+          <span className="mx-4 text-gray-400 text-sm">Or register with email</span>
+          <div className="flex-grow border-t border-gray-300"></div>
         </div>
 
+        {/* Email Registration */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <UserIcon className="h-5 w-5 text-navy-400" />
+              <UserIcon className="h-5 w-5 text-gray-400" />
             </div>
             <input
               type="email"
               placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-navy-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold focus:border-transparent transition-all duration-200"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
               required
             />
           </div>
 
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <KeyIcon className="h-5 w-5 text-navy-400" />
+              <KeyIcon className="h-5 w-5 text-gray-400" />
             </div>
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-10 pr-12 py-3 border border-navy-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold focus:border-transparent transition-all duration-200"
+              className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-navy-400 hover:text-navy-600 transition-colors duration-200"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors duration-200"
             >
               {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
             </button>
@@ -125,8 +134,8 @@ const RegisterPage = () => {
             disabled={loading}
             className={`w-full py-3 px-4 rounded-xl text-white font-medium transition-all duration-200 ${
               loading
-                ? "bg-navy-400 cursor-not-allowed"
-                : "bg-navy-700 hover:bg-navy-800 shadow-md hover:shadow-lg"
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-md hover:shadow-lg"
             }`}
           >
             {loading ? "Creating account..." : "Create Account"}
@@ -134,11 +143,11 @@ const RegisterPage = () => {
         </form>
 
         <div className="mt-8 text-center">
-          <p className="text-navy-600">
+          <p className="text-gray-600">
             Already have an account?{" "}
             <span
               onClick={() => navigate("/login")}
-              className="text-gold hover:text-gold-600 font-medium cursor-pointer transition-colors duration-200"
+              className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer transition-colors duration-200"
             >
               Sign in
             </span>

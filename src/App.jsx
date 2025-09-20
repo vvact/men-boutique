@@ -15,6 +15,9 @@ import Footer from "./components/Footer";
 import CategoryPage from "./pages/CategoryPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPages";
+import OrderDetail from "./pages/OrderDetail"
+import OrdersList from "./pages/OrdersList";
+
 
 function AppWrapper() {
   const location = useLocation();
@@ -41,6 +44,8 @@ function AppWrapper() {
         <Route path="/products/:slug" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/order/:id" element={<OrderDetail />} />
+        <Route path="/orders" element={<OrdersList />} />
         <Route path="/category/:slug" element={<CategoryPage />} />
       </Routes>
       <Footer />
