@@ -4,10 +4,6 @@
 
 
 
-@import "~slick-carousel/slick/slick.css";
-@import "~slick-carousel/slick/slick-theme.css";
-
-
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
