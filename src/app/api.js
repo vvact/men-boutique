@@ -3,7 +3,7 @@ import axios from "axios";
 
 // Create axios instance
 const api = axios.create({
-  baseURL: "http://localhost:8000/api/", // update if your backend URL is different
+  baseURL: "https://gentlemanwell.shop/api/", // update if your backend URL is different
   headers: {
     "Content-Type": "application/json",
   },
@@ -37,7 +37,7 @@ api.interceptors.response.use(
       try {
         // Refresh the access token
         const refresh = localStorage.getItem("refresh");
-        const res = await axios.post("http://localhost:8000/api/auth/token/refresh/", {
+        const res = await axios.post("https://gentlemanwell.shop/api/auth/token/refresh/", {
           refresh,
         });
         localStorage.setItem("access", res.data.access);
